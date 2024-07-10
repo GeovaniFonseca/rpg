@@ -1,5 +1,3 @@
-package rpg;
-
 public class Arqueiro extends Personagem {
     private Arma arma;
 

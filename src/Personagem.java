@@ -1,5 +1,3 @@
-package rpg;
-
 public abstract class Personagem {
     protected String nome;
     protected int ataque;
@@ -51,6 +49,5 @@ public abstract class Personagem {
         this.defendendo = false;
     }
 }
-
 
 

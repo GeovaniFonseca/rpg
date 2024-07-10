@@ -1,5 +1,3 @@
-package rpg;
-
 public class Arma {
     private String nome;
     private int incrementoAtaque;

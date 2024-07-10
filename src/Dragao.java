@@ -1,5 +1,3 @@
-package rpg;
-
 public class Dragao extends Personagem {
     public Dragao() {
         super("Dragão", 30, 30, 300);

@@ -1,10 +1,8 @@
-package rpg;
-
-public class Mago extends Personagem {
+public class Guerreiro extends Personagem {
     private Arma arma;
 
-    public Mago(String nome, Arma arma) {
-        super(nome, 20, 10, 200);
+    public Guerreiro(String nome, Arma arma) {
+        super(nome, 30, 20, 180);
         this.arma = arma;
     }
 
