@@ -17,7 +17,6 @@ public class Jogo {
             int escolhaPersonagem = scanner.nextInt();
             if (escolhaPersonagem == 0) {
                 break;
-
             }
 
             System.out.println("Escolha sua arma:");
