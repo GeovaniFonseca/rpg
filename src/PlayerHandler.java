@@ -1,4 +1,3 @@
-// PlayerHandler.java
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
@@ -8,20 +7,38 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class PlayerHandler implements Runnable {
+    /* 
+    Variáveis Compartilhadas
+    gameLock: Lock para sincronizar o acesso ao jogo.
+    playerTurnCondition: Condition para gerenciar o turno dos jogadores.
+    currentPlayerTurn: Armazena qual jogador está no turno atual.
+    personagens: Array que contém os personagens dos jogadores.
+    dragao: Instância compartilhada do dragão, o inimigo comum.
+    pontos: Pontuação dos jogadores.
+    PONTOS_PARA_VENCER: Pontos necessários para vencer o jogo.
+    jogoAtivo: Booleano que indica se o jogo está ativo.
+    */
     private static final Lock gameLock = new ReentrantLock();
     private static final Condition playerTurnCondition = gameLock.newCondition();
     private static int currentPlayerTurn = 1;
     private static Personagem[] personagens = new Personagem[2];
-    private static Personagem dragao = new Dragao();  // Estado compartilhado do dragão
-    private static int[] pontos = {0, 0};  // Pontuação dos jogadores
+    private static Personagem dragao = new Dragao();
+    private static int[] pontos = {0, 0};
     private static final int PONTOS_PARA_VENCER = 5;
     private static boolean jogoAtivo = true;
 
+
+    // Variáveis de instância para cada jogador
     private Socket playerSocket;
     private int playerId;
     private BufferedReader input;
     private PrintWriter output;
 
+
+    /*
+     Contrutor
+     Inicializa o playerSocket e playerId com os valores fornecidos.
+     */
     public PlayerHandler(Socket socket, int id) {
         this.playerSocket = socket;
         this.playerId = id;
@@ -30,20 +47,23 @@ public class PlayerHandler implements Runnable {
     @Override
     public void run() {
         try {
+            // Inicializa os streams de entrada e saída para comunicação com o cliente
             input = new BufferedReader(new InputStreamReader(playerSocket.getInputStream()));
             output = new PrintWriter(playerSocket.getOutputStream(), true);
 
+            // Envia mensagens iniciais para o jogador
             output.println("Você é o Jogador " + playerId);
             output.println("Escolha seu personagem: 1. Guerreiro 2. Mago 3. Arqueiro");
             int escolhaPersonagem = Integer.parseInt(input.readLine());
 
+            // Escolha da arma e personagem
             Arma armaEscolhida = null;
             output.println("Escolha sua arma:");
             if (escolhaPersonagem == 1) {
                 output.println("1. Espada (+10 ATQ, +15 DEF) 2. Machado (+17 ATQ, +9 DEF)");
                 int escolhaArma = Integer.parseInt(input.readLine());
                 if (escolhaArma == 1) {
-                    armaEscolhida = new Arma("Espada", 100, 15);
+                    armaEscolhida = new Arma("Espada", 10, 15);
                 } else {
                     armaEscolhida = new Arma("Machado", 17, 9);
                 }
@@ -68,12 +88,14 @@ public class PlayerHandler implements Runnable {
                 personagens[playerId - 1] = new Arqueiro("Arqueiro", armaEscolhida);
             }
 
+            // Loga a escolha do jogador
             GameLog.addLog("Jogador " + playerId + " escolheu " + personagens[playerId - 1].getNome() + " com " + armaEscolhida.getNome());
             output.println("Aguardando o outro jogador...");
 
             while (jogoAtivo) {
                 gameLock.lock();
                 try {
+                    // Espera pelo turno do jogador
                     while (currentPlayerTurn != playerId) {
                         playerTurnCondition.await();
                     }
@@ -83,6 +105,7 @@ public class PlayerHandler implements Runnable {
                         break;
                     }
 
+                    // Ações do jogador
                     output.println("Sua vez! Escolha sua ação: 1. Atacar 2. Defender 3. Ver histórico de batalhas");
                     String action = input.readLine();
 
@@ -102,6 +125,7 @@ public class PlayerHandler implements Runnable {
                         break;
                     }
 
+                    // Alterna o turno entre os jogadores
                     currentPlayerTurn = (currentPlayerTurn % 2) + 1;
 
                     // Dragão ataca um jogador aleatório após cada turno
@@ -133,6 +157,7 @@ public class PlayerHandler implements Runnable {
     private void atacar() {
         Personagem atacante = personagens[playerId - 1];
 
+        // Calcula o dano causado ao dragão
         int dano = calcularDano(atacante.calcularAtaque(), dragao.calcularDefesa());
         dragao.setPontosDeVida(dragao.getPontosDeVida() - dano);
         String log = "Jogador " + playerId + " atacou o Dragão e causou " + dano + " de dano. O Dragão tem " + dragao.getPontosDeVida() + " pontos de vida.";

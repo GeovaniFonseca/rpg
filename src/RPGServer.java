@@ -1,5 +1,6 @@
 // RPGServer.java
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -10,7 +11,7 @@ public class RPGServer {
     private static final ExecutorService playerThreads = Executors.newFixedThreadPool(MAX_PLAYERS);
 
     public static void main(String[] args) {
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT, 0, InetAddress.getByName("192.168.1.2"))) {
             System.out.println("Servidor do RPG iniciado...");
             int playerCount = 0;
 

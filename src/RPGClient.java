@@ -4,7 +4,7 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class RPGClient {
-    private static final String SERVER_ADDRESS = "localhost";
+    private static final String SERVER_ADDRESS = "192.168.1.2";
     private static final int SERVER_PORT = 12345;
 
     public static void main(String[] args) {
